@@ -29,9 +29,9 @@ fn parse_args() -> Arguments {
     }
 
     Arguments { target: args[0].clone(),
-                 replacement: args[1].clone(),
-                 filename: args[2].clone(),
-                 output: args[3].clone()
+                replacement: args[1].clone(),
+                filename: args[2].clone(),
+                output: args[3].clone()
     }
 }
 
@@ -65,7 +65,7 @@ fn main() {
         Ok(_) => {},
         Err(e) => {
             eprintln!("{} failed to write to file '{}': {:?}",
-                "Error:".red().bold(), args.filename, e);
+                "Error:".red().bold(), args.output, e);
             std::process::exit(1);
         }
     };
