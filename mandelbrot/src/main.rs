@@ -4,6 +4,7 @@ use std::str::FromStr;
 use image::ColorType;
 use image::png::PNGEncoder;
 use std::fs::File;
+
 extern crate num_cpus;
 
 /// This is an example of a Rust doc. This function determines if `c` is in
@@ -35,10 +36,7 @@ fn parse_pair<T: FromStr>(s: &str, separator: char) -> Option<(T, T)> {
 
 /// Parse a pair of floating-point numbers separated by a comma as a complex number
 fn parse_complex(s: &str) -> Option<Complex<f64>> {
-    match parse_pair(s, ',') {
-        Some((re, im)) => Some(Complex { re, im }),
-        None => None,
-    }
+    parse_pair(s, ',').map(|(re, im)| Complex {re, im})
 }
 
 /// Given the row and column of a pixel in the output image, return the corresponding
@@ -86,7 +84,7 @@ fn write_image(filename: &str, pixels: &[u8], bounds: (usize, usize))
     let output = File::create(filename)?;
     
     let encoder = PNGEncoder::new(output);
-    encoder.encode(&pixels, bounds.0 as u32, bounds.1 as u32,
+    encoder.encode(pixels, bounds.0 as u32, bounds.1 as u32,
                    ColorType::Gray(8))?;
 
     Ok(())

@@ -1,6 +1,6 @@
 fn main() {
     let _arr = [2, 4, 6, 8];
-    println!("Array length? {}", "nope");
+    println!("Array length? nope");
     let x: i64 = 28;
     println!("Value of x i64: {}", x);
 
