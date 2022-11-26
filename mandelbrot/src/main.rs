@@ -5,7 +5,7 @@ use image::ColorType;
 use image::png::PNGEncoder;
 use std::fs::File;
 
-extern crate num_cpus;
+// extern crate num_cpus;
 
 mod tests;
 
@@ -98,7 +98,7 @@ fn main() {
 
     if args.len() != 5 {
         eprintln!("Usage: {} FILE PIXELS UPPERLEFT LOWERRIGHT", args[0]);
-        eprintln!("Example: {} mandel.png 1000x750 -1.20,0.35, -1,0.20", args[0]);
+        eprintln!("Example: {} mandel.png 1000x750 -1.20,0.35 -1,0.20", args[0]);
         std::process::exit(1);
     }
 
