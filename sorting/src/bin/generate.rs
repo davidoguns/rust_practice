@@ -5,7 +5,7 @@ fn parse_args() -> (i32, i32, Option<u32>) {
     let lower_bound = args.next().unwrap().parse::<i32>().unwrap();
     let upper_bound = args.next().unwrap().parse::<i32>().unwrap();
     let amount = match args.next() {
-        Some(amount_arg) => 
+        Some(amount_arg) =>
             match amount_arg.parse::<u32>() {
                 Ok(x) => Some(x),
                 Err(_) => {
