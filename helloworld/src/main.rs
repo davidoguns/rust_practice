@@ -24,6 +24,21 @@ struct Book {
     num_ratings: u32,
 }
 
+trait NewBook {
+    fn new(title: String, isbn: String, review: f32, num_ratings: u32) -> Self;
+}
+
+impl NewBook for Book {
+    fn new(title: String, isbn: String, review: f32, num_ratings: u32) -> Self {
+        Self {
+            title,
+            isbn,
+            avg_review: review,
+            num_ratings,
+        }
+    }
+}
+
 impl Titled for Movie {
     fn show_title(&self) -> String {
         format!("{} ({})", self.title, self.year)
