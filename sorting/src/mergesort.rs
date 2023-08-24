@@ -2,6 +2,11 @@ pub fn merge_sort(numbers: Vec<i32>) -> Vec<i32> {
     merge_sort_internal(numbers)
 }
 
+pub fn merge_sort_in_place(numbers: &mut Vec<i32>) {
+    let end = numbers.len();
+    merge_sort_in_place_internal(numbers, 0, end);
+}
+
 fn merge_sort_internal(numbers: Vec<i32>) -> Vec<i32> {
     if numbers.len() == 1 || numbers.len() == 0 {
         numbers
@@ -33,11 +38,6 @@ fn merge_sort_internal(numbers: Vec<i32>) -> Vec<i32> {
         }
         merged
     }
-}
-
-pub fn merge_sort_in_place(numbers: &mut Vec<i32>) {
-    let end = numbers.len();
-    merge_sort_in_place_internal(numbers, 0, end);
 }
 
 fn merge_sort_in_place_internal(numbers: &mut Vec<i32>, start: usize, end: usize) {

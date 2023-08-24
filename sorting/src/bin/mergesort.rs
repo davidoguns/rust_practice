@@ -12,7 +12,7 @@ fn main() {
             let mut sorted_in_place = unsorted.clone();
             let sorted = merge_sort(unsorted);
             print_nums(&sorted);
-            println!("In place results...");
+            eprintln!("In place results...");
             merge_sort_in_place(&mut sorted_in_place);
             print_nums(&sorted_in_place);
         }
