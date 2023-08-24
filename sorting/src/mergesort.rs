@@ -41,18 +41,17 @@ pub fn merge_sort_in_place(numbers: &mut Vec<i32>) {
 }
 
 fn merge_sort_in_place_internal(numbers: &mut Vec<i32>, start: usize, end: usize) {
-    let length = end - start;
+    let length: usize = end - start;
     if length == 1 || length == 0 {
         return
     }
     else if length == 2 {
-        //simple logic here
-        if numbers.get(0).unwrap() > numbers.get(1).unwrap() {
-            numbers.swap(0, 1);
+        if numbers.get(start).unwrap() > numbers.get(end-1).unwrap() {
+            numbers.swap(start, end-1);
         }
     }
     else {
-        let mid_index = (end - start) / 2;
+        let mid_index: usize = (end + start) / 2;
         //sort left side
         merge_sort_in_place_internal(numbers, start, mid_index);
         //sort right side
@@ -65,15 +64,14 @@ fn merge_sort_in_place_internal(numbers: &mut Vec<i32>, start: usize, end: usize
         while left_index < right_index && right_index < end {
             if numbers.get(left_index).unwrap() < numbers.get(right_index).unwrap() {
                 //order is fine, leave it
-                insert_index += 1;
                 left_index += 1;
             }
             else {
                 //grab the value to insert from right list
                 let insert_value = *numbers.get(right_index).unwrap();
                 //shift every value down until it hits the right list
-                for shift_index in right_index..left_index {
-                    *numbers.get_mut(shift_index).unwrap() = *numbers.get(shift_index-1).unwrap();
+                for shift_index in (left_index..right_index).rev() {
+                    *numbers.get_mut(shift_index+1).unwrap() = *numbers.get(shift_index).unwrap();
                 }
                 *numbers.get_mut(insert_index).unwrap() = insert_value;
                 right_index += 1;
