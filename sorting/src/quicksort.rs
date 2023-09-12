@@ -11,12 +11,11 @@ fn quicksort_internal(numbers: &mut Vec<i32>, start: usize, end: usize) {
             numbers.swap(start, end);
         }
     } else {
-        let pivot_index = end;
-        let pivot_value = *numbers.get(pivot_index).unwrap();
+        let pivot_value = *numbers.get(end).unwrap();
         //these two counts also serve as letting us know how the partition
         //will be split when recursively calling quicksort
         let (mut lesser_count, mut greater_count) = (0, 0);
-        for index in start..pivot_index {
+        for index in start..end {
             if *numbers.get(index).unwrap() < pivot_value {
                 if greater_count != 0 { //if greater count == 0; then the number is fine in place
                     numbers.swap(start + lesser_count, index);
@@ -26,10 +25,9 @@ fn quicksort_internal(numbers: &mut Vec<i32>, start: usize, end: usize) {
                 greater_count += 1;
             }
         }
-        // let mid_index = if lesser_count > 0 { start + lesser_count } else { pivot_index };
         let mid_index = (start + lesser_count).clamp(1, end);
         //place pivot in the middle of array, all values above have been shifted over
-        numbers.swap(mid_index, pivot_index);
+        numbers.swap(mid_index, end);
         quicksort_internal(numbers, start, mid_index-1);
         quicksort_internal(numbers, mid_index+1, end);
     }

@@ -2,6 +2,9 @@ pub fn merge_sort(numbers: Vec<i32>) -> Vec<i32> {
     merge_sort_internal(numbers)
 }
 
+// This is a naive in place algorithm that's actually N^2
+// sorting 100k integers is observably slow versus the non in place
+// which completes way faster
 pub fn merge_sort_in_place(numbers: &mut Vec<i32>) {
     let end = numbers.len();
     merge_sort_in_place_internal(numbers, 0, end);
