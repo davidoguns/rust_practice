@@ -10,9 +10,9 @@ fn main() {
     match load_nums(input_size, &stdin()) {
         Ok(unsorted) => {
             let mut sorted_in_place = unsorted.clone();
-            let sorted = merge_sort(unsorted);
-            print_nums(&sorted);
-            eprintln!("In place results...");
+            // let sorted = merge_sort(unsorted);
+            // print_nums(&sorted);
+            // eprintln!("In place results...");
             merge_sort_in_place(&mut sorted_in_place);
             print_nums(&sorted_in_place);
         }
