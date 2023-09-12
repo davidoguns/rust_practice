@@ -19,13 +19,7 @@ fn quicksort_internal(numbers: &mut Vec<i32>, start: usize, end: usize) {
         for index in start..pivot_index {
             if *numbers.get(index).unwrap() < pivot_value {
                 if greater_count != 0 { //if greater count == 0; then the number is fine in place
-                    let insert_value = *numbers.get(index).unwrap();
-                    let start_shift_up = start + lesser_count;
-                    let shift_up_range = (start_shift_up..(start_shift_up + greater_count)).rev();
-                    for shift_index in shift_up_range {
-                        *numbers.get_mut(shift_index+1).unwrap() = *numbers.get_mut(shift_index).unwrap();
-                    }
-                    *numbers.get_mut(start + lesser_count).unwrap() = insert_value;
+                    numbers.swap(start + lesser_count, index);
                 }
                 lesser_count += 1;
             } else {
