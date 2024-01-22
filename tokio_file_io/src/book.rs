@@ -26,10 +26,6 @@ impl Book {
     pub fn isbn(&self) -> &str {
         self.isbn.as_str()
     }
-
-    fn validate(self) -> bool {
-        true
-    }
 }
 
 impl std::fmt::Display for Book {
