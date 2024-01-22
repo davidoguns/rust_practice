@@ -1,4 +1,6 @@
+use serde::{Serialize, Deserialize};
 
+#[derive(Serialize, Deserialize)]
 pub struct Book {
     title: String,
     author: String,

@@ -3,6 +3,19 @@ mod book;
 use std::collections::linked_list::LinkedList;
 use book::Book;
 use std::io::Write;
+use serde::{Serialize, Deserialize};
+
+#[derive(Deserialize)]
+struct BookDbDeser {
+    num_books: i16,
+    books: LinkedList<Book>
+}
+
+#[derive(Serialize)]
+struct BookDB<'a> {
+    num_books: i16,
+    books: Vec<&'a Book>
+}
 
 fn read_stdin_option() -> Option<i16> {
     let mut input = String::new();
@@ -177,13 +190,15 @@ fn save_books(book_db: &LinkedList<Book>) {
                     return
                 },
                 Ok(mut file) => {
-                    let num_books = format!("{}\n", book_db.len());
-                    //write number of books first
-                    let _size_written = file.write(num_books.as_bytes());
-
-                    for book in book_db {
-                        let _size_written = file.write(format!("{}|{}|{}|{}\n",
-                                book.title(), book.author(), book.year_published(), book.isbn()).as_bytes());
+                    let db = BookDB {
+                        num_books: book_db.len() as i16,
+                        books: book_db.iter().collect::<Vec<&Book>>()
+                    };
+                    if let Ok(serialized) = serde_json::to_string(&db) {
+                        let _bytes_written = file.write(serialized.as_bytes());
+                    } else {
+                        println!("Could not serialize DB to JSON with serde");
+                        return
                     }
                 }
             };
@@ -236,39 +251,14 @@ fn load_books(book_db: &mut LinkedList<Book>) {
                     input.clear();
                     match file.read_to_string(&mut input) {
                         Ok(_bytes_read) => {
-                            //first line should be the proper count of books in the database
-                            let mut line_itr = input.lines();
-                            if let Some(num_books_line) = line_itr.next() {
-                                if let Ok(num_books) = num_books_line.parse::<usize>() {
-                                    for index in 0..num_books {
-                                        if let Some(book_line) = line_itr.next() {
-                                            let parts = book_line.split('|').collect::<Vec<&str>>();
-                                            if parts.len() == 4 {
-                                                if let Ok(year_published) = parts[2].parse::<i16>() {
-                                                    book_db.push_back(Book::new(
-                                                        String::from(parts[0]),
-                                                        String::from(parts[1]),
-                                                        year_published,
-                                                        String::from(parts[3])));
-                                                } else {
-                                                    println!("Line {} doesn't have a valid publish year as number", index+1);
-                                                    continue;
-                                                }
-                                            } else {
-                                                println!("Line {} is malformed, skipping...", index+1);
-                                                continue;
-                                            }
-                                        } else {
-                                            println!("Unexpected end of books db at line {}", index+1);
-                                            return
-                                        }
-                                    }
-                                } else {
-                                    println!("Couldn't parse number of books from the first line [{}]", num_books_line);
-                                    return
+                            //deserialize json here
+                            if let Ok(deserialized) = serde_json::from_str::<BookDbDeser>(&input) {
+                                for book in deserialized.books {
+                                    // move book ownership over
+                                    book_db.push_back(book);
                                 }
                             } else {
-                                println!("Couldn't get line to read number of books");
+                                println!("Could not deserialize book DB using serde");
                                 return
                             }
                         },
