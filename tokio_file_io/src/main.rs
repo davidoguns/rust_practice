@@ -159,10 +159,141 @@ fn view_book(book_db: &LinkedList<Book>) {
     }
 }
 
+fn save_books(book_db: &LinkedList<Book>) {
+    use std::io::prelude::*;
+    use std::fs::File;
+    use std::path::Path;
+
+    let mut input = String::new();
+
+    print!("Enter filename to save to: ");
+    std::io::stdout().flush().unwrap();
+    match std::io::stdin().read_line(&mut input) {
+        Ok(_bytes_read) => {
+            let path = Path::new(input.trim());
+            match File::create(&path) {
+                Err(_e) => {
+                    println!("Error creating file [{}] for writing", input.trim());
+                    return
+                },
+                Ok(mut file) => {
+                    let num_books = format!("{}\n", book_db.len());
+                    //write number of books first
+                    let _size_written = file.write(num_books.as_bytes());
+
+                    for book in book_db {
+                        let _size_written = file.write(format!("{}|{}|{}|{}\n",
+                                book.title(), book.author(), book.year_published(), book.isbn()).as_bytes());
+                    }
+                }
+            };
+        },
+        Err(_e) => {
+            println!("Error reading filename from stdin");
+            return
+        }
+    }
+}
+
+fn load_books(book_db: &mut LinkedList<Book>) {
+    use std::io::prelude::*;
+    use std::fs::File;
+    use std::path::Path;
+
+    let mut input = String::new();
+    let mut overwrite = true;
+    
+    if !book_db.is_empty() {
+        print!("Books exist in DB, [o]verwrite DB, [a]ppend DB, or [c]ancel? [c]: ");
+        std::io::stdout().flush().unwrap();
+        input.clear();
+        overwrite = match std::io::stdin().read_line(&mut input) {
+            Ok(_bytes_read) => {
+                match input.trim().to_lowercase().as_str() {
+                    "a" => { false },
+                    "o" => { true },
+                    _ => { return }
+                }
+            },
+            Err(_e) => {
+                println!("Error reading write option choice from stdin");
+                return
+            }
+        }
+    }
+
+    if overwrite {
+        book_db.clear();
+    }
+
+    print!("Enter filename to load from: ");
+    std::io::stdout().flush().unwrap();
+    input.clear();
+    match std::io::stdin().read_line(&mut input) {
+        Ok(_bytes_read) => {
+            match File::open(&Path::new(input.trim())) {
+                Ok(mut file) => {
+                    input.clear();
+                    match file.read_to_string(&mut input) {
+                        Ok(_bytes_read) => {
+                            //first line should be the proper count of books in the database
+                            let mut line_itr = input.lines();
+                            if let Some(num_books_line) = line_itr.next() {
+                                if let Ok(num_books) = num_books_line.parse::<usize>() {
+                                    for index in 0..num_books {
+                                        if let Some(book_line) = line_itr.next() {
+                                            let parts = book_line.split('|').collect::<Vec<&str>>();
+                                            if parts.len() == 4 {
+                                                if let Ok(year_published) = parts[2].parse::<i16>() {
+                                                    book_db.push_back(Book::new(
+                                                        String::from(parts[0]),
+                                                        String::from(parts[1]),
+                                                        year_published,
+                                                        String::from(parts[3])));
+                                                } else {
+                                                    println!("Line {} doesn't have a valid publish year as number", index+1);
+                                                    continue;
+                                                }
+                                            } else {
+                                                println!("Line {} is malformed, skipping...", index+1);
+                                                continue;
+                                            }
+                                        } else {
+                                            println!("Unexpected end of books db at line {}", index+1);
+                                            return
+                                        }
+                                    }
+                                } else {
+                                    println!("Couldn't parse number of books from the first line [{}]", num_books_line);
+                                    return
+                                }
+                            } else {
+                                println!("Couldn't get line to read number of books");
+                                return
+                            }
+                        },
+                        Err(_e) => {
+                            println!("Error reading contents of file {} into string", input.trim());
+                        }
+                    }
+                },
+                Err(_e) => {
+                    println!("Error opening file {} for loading", input.trim());
+                    return
+                }
+            }
+        },
+        Err(_e) => {
+            println!("Error reading filename to load from stdin");
+            return
+        }
+    }
+}
+
 fn main() {
     let mut book_db = LinkedList::<Book>::new();
 
-    loop { 
+    loop {
         println!(""); // just want a newline
         println!("=========================================================================");
         println!("Welcome to the books database. There are {} books in the database.", book_db.len());
@@ -188,6 +319,12 @@ fn main() {
             },
             Some(4) => {
                 view_all_books(&book_db);
+            },
+            Some(5) => {
+                load_books(&mut book_db);
+            },
+            Some(6) => {
+                save_books(&book_db);
             },
             Some(7) => {
                 println!("Thank you for using the book library.");
