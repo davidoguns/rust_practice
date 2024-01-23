@@ -180,10 +180,10 @@ fn save_books(book_db: &LinkedList<Book>) {
                 Ok(mut file) => {
                     let num_books = format!("{}\n", book_db.len());
                     //write number of books first
-                    let _size_written = file.write(num_books.as_bytes());
+                    let _size_written = file.write_all(num_books.as_bytes());
 
                     for book in book_db {
-                        let _size_written = file.write(format!("{}|{}|{}|{}\n",
+                        let _size_written = file.write_all(format!("{}|{}|{}|{}\n",
                                 book.title(), book.author(), book.year_published(), book.isbn()).as_bytes());
                     }
                 }
