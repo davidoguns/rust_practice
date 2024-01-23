@@ -24,6 +24,14 @@ impl<T> List<T> {
         }
     }
 
+    pub fn push_back_itr(&mut self, value: T) {
+        let mut current = self;
+        while let List::NonEmpty(current_node) = current {
+            current = &mut current_node.next;
+        }
+        *current = List::NonEmpty(Box::new(ListNode::<T>{value, next: List::Empty}));
+    }
+
     pub fn length(&self) -> usize {
         match &self {
             List::Empty => { 0 },
@@ -71,5 +79,10 @@ mod test {
         assert_eq!(3, list1.length_itr());
         assert_eq!(Some(&3), list1.get(2));
         assert_eq!(None, list1.get(3));
+        list1.push_back_itr(4);
+        assert_eq!(4, list1.length());
+        assert_eq!(4, list1.length_itr());
+        assert_eq!(Some(&4), list1.get(3));
+        assert_eq!(None, list1.get(4));
     }
 }
