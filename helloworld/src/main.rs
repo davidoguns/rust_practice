@@ -85,8 +85,14 @@ fn get_string() -> &'static str {
 }
 
 fn main() {
-    println!("Size of non-boxed option: {}", std::mem::size_of::<Option<i32>>());
-    println!("Size of boxed option: {}", std::mem::size_of::<Option<Box<i32>>>());
+    println!(
+        "Size of non-boxed option: {}",
+        std::mem::size_of::<Option<i32>>()
+    );
+    println!(
+        "Size of boxed option: {}",
+        std::mem::size_of::<Option<Box<i32>>>()
+    );
     let s = get_string();
     println!("String that was gotten: {}", s);
     let books = vec![
