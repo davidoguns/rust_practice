@@ -8,6 +8,6 @@ edition = "2021"
 [dependencies]
 tokio = { version = "1", features = [ "full" ] }
 log = "0.4"
-simple_logger = "4"
+simple_logger = "5"
 fmt = "0.1"
 regex = "1"

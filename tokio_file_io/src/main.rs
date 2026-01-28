@@ -171,6 +171,13 @@ fn save_books(book_db: &LinkedList<Book>) {
     match std::io::stdin().read_line(&mut input) {
         Ok(_bytes_read) => {
             let path = Path::new(input.trim());
+            let path_quit_pattern = regex::Regex::new(r"(?i)^q(uit)?").unwrap();
+            if let Some(path_str) = path.to_str() {
+                if path_quit_pattern.is_match(path_str) {
+                    println!("Aborting file save");
+                    return
+                }
+            }
             match File::create(&path) {
                 Err(_e) => {
                     println!("Error creating file [{}] for writing", input.trim());
