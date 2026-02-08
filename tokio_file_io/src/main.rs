@@ -165,7 +165,7 @@ fn view_book(book_db: &LinkedList<Book>) {
 }
 
 fn save_books(book_db: &LinkedList<Book>, library: &BookDiskStorage) {
-    match library.save_books(&book_db) {
+    match library.save_books_json(&book_db) {
         Ok(_) => return,
         Err(e) => {
             eprintln!("Error saving to books DB :: {}", e); 
