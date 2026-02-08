@@ -1,8 +1,13 @@
 mod book;
+mod library;
 
-use book::Book;
 use std::collections::linked_list::LinkedList;
 use std::io::Write;
+
+use book::Book;
+use library::BookDiskStorage;
+
+use crate::library::BookStorage;
 
 fn read_stdin_option() -> Option<i16> {
     let mut input = String::new();
@@ -159,7 +164,17 @@ fn view_book(book_db: &LinkedList<Book>) {
     }
 }
 
-fn save_books(book_db: &LinkedList<Book>) {
+fn save_books(book_db: &LinkedList<Book>, library: &BookDiskStorage) {
+    match library.save_books(&book_db) {
+        Ok(_) => return,
+        Err(e) => {
+            eprintln!("Error saving to books DB :: {}", e); 
+            return;
+        }
+    }
+}
+
+fn _save_books(book_db: &LinkedList<Book>) {
     use std::fs::File;
     use std::io::prelude::*;
     use std::path::Path;
@@ -210,7 +225,17 @@ fn save_books(book_db: &LinkedList<Book>) {
     }
 }
 
-fn load_books(book_db: &mut LinkedList<Book>) {
+fn load_books(book_db: &mut LinkedList<Book>, library: &BookDiskStorage) {
+    match library.load_books(book_db){
+        Ok(_) => return,
+        Err(e) => {
+            eprintln!("Error loading books from DB :: {}", e); 
+            return;
+        }
+    }
+}
+
+fn _load_books(book_db: &mut LinkedList<Book>) {
     use std::fs::File;
     use std::io::prelude::*;
     use std::path::Path;
@@ -321,7 +346,12 @@ fn load_books(book_db: &mut LinkedList<Book>) {
 }
 
 fn main() {
+    let trt = tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .unwrap();
     let mut book_db = LinkedList::<Book>::new();
+    let library = BookDiskStorage::new(trt, "books.tdb");
 
     loop {
         println!(""); // just want a newline
@@ -354,10 +384,10 @@ fn main() {
                 view_all_books(&book_db);
             }
             Some(5) => {
-                load_books(&mut book_db);
+                load_books(&mut book_db, &library);
             }
             Some(6) => {
-                save_books(&book_db);
+                save_books(&book_db, &library);
             }
             Some(7) => {
                 println!("Thank you for using the book library.");
