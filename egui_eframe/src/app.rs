@@ -1,4 +1,3 @@
-
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
@@ -18,8 +17,8 @@ impl Default for HelloEguiApp {
     fn default() -> Self {
         Self {
             // Example stuff:
-            window_title: "Default Window Title".to_owned(),
-            window_title_edit: "".to_owned(),
+            window_title: String::from("Default Window Title"),
+            window_title_edit: String::new(),
             label: "Hello World!".to_owned(),
             value: 2.7,
         }
@@ -82,7 +81,7 @@ impl eframe::App for HelloEguiApp {
                 if ui.button("Update Title").clicked() {
                     self.window_title = self.window_title_edit.clone();
                     //unsure if we need to command a repaint possibly here?
-                };
+                }
             });
 
             ui.add(egui::Slider::new(&mut self.value, 0.0..=10.0).text("value"));
