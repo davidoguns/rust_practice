@@ -18,7 +18,7 @@ fn main() -> eframe::Result {
         ..Default::default()
     };
     eframe::run_native(
-        "eframe template",
+        "Window Native Title",
         native_options,
         Box::new(|cc| Ok(Box::new(egui_hello::HelloEguiApp::new(cc)))),
     )
