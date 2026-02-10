@@ -1,7 +1,12 @@
+
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
 pub struct HelloEguiApp {
+    // Updatable eframe window title
+    window_title: String,
+    window_title_edit: String,
+
     // Example stuff:
     label: String,
 
@@ -13,6 +18,8 @@ impl Default for HelloEguiApp {
     fn default() -> Self {
         Self {
             // Example stuff:
+            window_title: "Default Window Title".to_owned(),
+            window_title_edit: "".to_owned(),
             label: "Hello World!".to_owned(),
             value: 2.7,
         }
@@ -67,11 +74,15 @@ impl eframe::App for HelloEguiApp {
 
         egui::CentralPanel::default().show(ctx, |ui| {
             // The central panel the region left after adding TopPanel's and SidePanel's
-            ui.heading("eframe template");
+            ui.heading(self.window_title.as_str());
 
             ui.horizontal(|ui| {
                 ui.label("Write something: ");
-                ui.text_edit_singleline(&mut self.label);
+                ui.text_edit_singleline(&mut self.window_title_edit);
+                if ui.button("Update Title").clicked() {
+                    self.window_title = self.window_title_edit.clone();
+                    //unsure if we need to command a repaint possibly here?
+                };
             });
 
             ui.add(egui::Slider::new(&mut self.value, 0.0..=10.0).text("value"));
