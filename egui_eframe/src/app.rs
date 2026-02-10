@@ -78,8 +78,13 @@ impl eframe::App for HelloEguiApp {
             ui.horizontal(|ui| {
                 ui.label("Write something: ");
                 ui.text_edit_singleline(&mut self.window_title_edit);
+                
+                #[cfg(not(target_arch = "wasm32"))]
                 if ui.button("Update Title").clicked() {
                     self.window_title = self.window_title_edit.clone();
+                    ctx.send_viewport_cmd(egui::ViewportCommand::Title(
+                        self.window_title_edit.clone(),
+                    ));
                     //unsure if we need to command a repaint possibly here?
                 }
             });
