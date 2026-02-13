@@ -1,6 +1,7 @@
 /// We derive Deserialize/Serialize so we can persist app state on shutdown.
 #[derive(serde::Deserialize, serde::Serialize)]
 #[serde(default)] // if we add new fields, give them default values when deserializing old state
+
 pub struct HelloEguiApp {
     // Updatable eframe window title
     window_title: String,
@@ -78,14 +79,21 @@ impl eframe::App for HelloEguiApp {
             ui.horizontal(|ui| {
                 ui.label("Write something: ");
                 ui.text_edit_singleline(&mut self.window_title_edit);
+
+                let btn_nothing = ui.button("Nothing");
+                if btn_nothing.clicked() {
+                    log::debug!("Do nothing button was clicked");
+                }
                 
-                #[cfg(not(target_arch = "wasm32"))]
+                // #[cfg(not(target_arch = "wasm32"))]
                 if ui.button("Update Title").clicked() {
                     self.window_title = self.window_title_edit.clone();
+                    
+                    log::info!("Update button pressed...about to send viewport command");
                     ctx.send_viewport_cmd(egui::ViewportCommand::Title(
                         self.window_title_edit.clone(),
                     ));
-                    //unsure if we need to command a repaint possibly here?
+                    log::info!("Viewport command sent.");
                 }
             });
 
