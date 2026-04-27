@@ -1,20 +1,8 @@
 use std::io;
 use std::io::Write;
 
-trait Titled {
-    fn show_title(&self) -> String;
-}
-
 trait Reviewed {
     fn show_review(&self) -> String;
-}
-
-#[derive(Debug)]
-struct Movie {
-    title: String,
-    year: String,
-    avg_review: f32,
-    num_ratings: u32,
 }
 
 struct Book {
@@ -24,46 +12,11 @@ struct Book {
     num_ratings: u32,
 }
 
-trait NewBook {
-    fn new(title: String, isbn: String, review: f32, num_ratings: u32) -> Self;
-}
-
-impl NewBook for Book {
-    fn new(title: String, isbn: String, review: f32, num_ratings: u32) -> Self {
-        Self {
-            title,
-            isbn,
-            avg_review: review,
-            num_ratings,
-        }
-    }
-}
-
-impl Titled for Movie {
-    fn show_title(&self) -> String {
-        format!("{} ({})", self.title, self.year)
-    }
-}
-
-impl Reviewed for Movie {
-    fn show_review(&self) -> String {
-        format!("Rating: {}; Count {}", self.avg_review, self.num_ratings)
-    }
-}
-
 impl Reviewed for Book {
     fn show_review(&self) -> String {
         format!("Rating: {}; Count {}", self.avg_review, self.num_ratings)
     }
 }
-
-impl Titled for Book {
-    fn show_title(&self) -> String {
-        format!("{} ({})", self.title, self.isbn)
-    }
-}
-
-trait ReviewedTitle: Reviewed + Titled {}
 
 fn show_reviews<T: Reviewed>(items: &[T]) {
     for item in items {
