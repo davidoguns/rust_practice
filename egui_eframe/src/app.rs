@@ -86,7 +86,6 @@ impl eframe::App for HelloEguiApp {
                 // #[cfg(not(target_arch = "wasm32"))]
                 if ui.button("Update Title").clicked() {
                     self.window_title = self.window_title_edit.clone();
-                    log::info!("Update button pressed...about to send viewport command");
                     ctx.send_viewport_cmd(egui::ViewportCommand::Title(
                         self.window_title_edit.clone(),
                     ));
