@@ -1,12 +1,9 @@
 use std::hint::black_box;
-use rand::Rng;
 use rand::RngExt;
 use helloworld::find_largest_num1;
 use helloworld::find_largest_num2;
 
-//todo: we could genercize this
-fn gen_rng_vec<T>(len: usize, mut fn_rng: impl FnMut()->T) -> Vec<T> 
-        where T: Ord {
+fn gen_rng_vec<T>(len: usize, mut fn_rng: impl FnMut()->T) -> Vec<T> {
     let mut v = Vec::<T>::with_capacity(len);
     for _ in 0..len {
         v.push(fn_rng());
