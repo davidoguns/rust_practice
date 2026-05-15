@@ -1,10 +1,17 @@
 [package]
 name = "helloworld"
 version = "0.1.0"
-authors = ["ebonyseraph"]
+authors = ["David Oguns <davidoguns@gmail.com>"]
 edition = "2024"
+description = "Scratchpad for testing basic syntax and language features."
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
 rand = "0.10"
+
+[dev-dependencies]
+criterion = { version = "0.8", features = ["html_reports"]}
+
+[[bench]]
+name = "my_benchmark"
+harness = false

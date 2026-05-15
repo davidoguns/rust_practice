@@ -174,6 +174,10 @@ fn save_books(book_db: &LinkedList<Book>, library: &BookDiskStorage) {
     }
 }
 
+//classic Rust std::io; perfectly usable but blocking. Not great if
+//disk IO is large enough to cause a GUI to "freeze up" because it's waiting
+//for reads and writes to complete. At least present user with a progress
+//bar or icon if they must wait.
 fn _save_books(book_db: &LinkedList<Book>) {
     use std::fs::File;
     use std::io::prelude::*;
@@ -183,46 +187,47 @@ fn _save_books(book_db: &LinkedList<Book>) {
 
     print!("Enter filename to save to: ");
     std::io::stdout().flush().unwrap();
-    match std::io::stdin().read_line(&mut input) {
+    let path = match std::io::stdin().read_line(&mut input) {
         Ok(_bytes_read) => {
-            let path = Path::new(input.trim());
+            let path_str = input.trim();
             let path_quit_pattern = regex::Regex::new(r"(?i)^q(uit)?").unwrap();
-            if let Some(path_str) = path.to_str() {
-                if path_quit_pattern.is_match(path_str) {
-                    println!("Aborting file save");
-                    return;
-                }
+            if path_quit_pattern.is_match(path_str) {
+                println!("Aborting file save");
+                return;
             }
-            match File::create(&path) {
-                Err(_e) => {
-                    println!("Error creating file [{}] for writing", input.trim());
-                    return;
-                }
-                Ok(mut file) => {
-                    let num_books = format!("{}\n", book_db.len());
-                    //write number of books first
-                    let _size_written = file.write_all(num_books.as_bytes());
-
-                    for book in book_db {
-                        let _size_written = file.write_all(
-                            format!(
-                                "{}|{}|{}|{}\n",
-                                book.title(),
-                                book.author(),
-                                book.year_published(),
-                                book.isbn()
-                            )
-                            .as_bytes(),
-                        );
-                    }
-                }
-            };
+            let path = Path::new(path_str);
+            path
         }
         Err(_e) => {
             println!("Error reading filename from stdin");
             return;
         }
-    }
+    };
+
+    match File::create(&path) {
+        Err(_e) => {
+            println!("Error creating file [{}] for writing", input.trim());
+            return;
+        }
+        Ok(mut file) => {
+            let num_books = format!("{}\n", book_db.len());
+            //write number of books first
+            let _size_written = file.write_all(num_books.as_bytes());
+
+            for book in book_db {
+                let _size_written = file.write_all(
+                    format!(
+                        "{}|{}|{}|{}\n",
+                        book.title(),
+                        book.author(),
+                        book.year_published(),
+                        book.isbn()
+                    )
+                    .as_bytes(),
+                );
+            }
+        }
+    };
 }
 
 fn load_books(book_db: &mut LinkedList<Book>, library: &BookDiskStorage) {
