@@ -11,7 +11,7 @@ fn gen_rng_vec<T>(len: usize, mut fn_rng: impl FnMut()->T) -> Vec<T> {
     v
 }
 
-fn find_largest(v: &Vec<i32>, fn_find: fn(&Vec<i32>) -> Option<i32>) {
+fn find_largest(v: &Vec<i32>, fn_find: fn(&Vec<i32>) -> Option<&i32>) {
     let largest = black_box(fn_find(black_box(&v)));
     if let Some(largest) = largest {
         println!("Largest: {largest}");

@@ -33,14 +33,37 @@ pub fn find_largest_num2<T>(v: &Vec<T>) -> Option<&T>
     largest_num
 }
 
+pub fn find_largest_in_slice(v: &[i32]) -> &i32 {
+    if v.len() == 0 {
+        return &0;
+    }
+    let mut largest = &v[0];
+    
+    for item in v {
+        if item > largest {
+            largest = item;
+        }
+    }
+    largest
+}
+
 #[cfg(test)]
 pub mod test {
     use crate::find_largest_num1;
     use crate::find_largest_num2;
+    use crate::find_largest_in_slice;
     use rand::RngExt;
 
     #[test]
-    pub fn test_find_largest_compat() {
+    pub fn test_find_largest_slice() {
+        let arr = [23, 19, 0, 199, 15];
+        let slice = &arr[..];
+        let largest_in_empty = find_largest_in_slice(slice);
+        assert_eq!(largest_in_empty, &199);
+    }
+
+    #[test]
+    pub fn test_find_largest_compare() {
         println!("i32 max: {}", i32::MAX);
         const VECSIZE_1: usize = 16384;
         let mut v1 = Vec::<i32>::with_capacity(VECSIZE_1);
