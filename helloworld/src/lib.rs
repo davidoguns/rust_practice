@@ -10,22 +10,24 @@ pub fn do_bar() {
     do_foo_sep();
 }
 
-pub fn find_largest_num1(v: &Vec<i32>) -> Option<i32> {
-    let mut largest_num = Option::<i32>::None;
+pub fn find_largest_num1<T>(v: &Vec<T>) -> Option<&T>
+    where T: PartialOrd {
+    let mut largest_num = Option::<&T>::None;
     v.iter()
-        .for_each(|n| largest_num = Some(largest_num.map_or(*n, |v| if v > *n { v } else { *n })));
+        .for_each(|n| largest_num = Some(largest_num.map_or(n, |v| if v > n { v } else { n })));
     largest_num
 }
 
-pub fn find_largest_num2(v: &Vec<i32>) -> Option<i32> {
-    let mut largest_num = Option::<i32>::None;
+pub fn find_largest_num2<T>(v: &Vec<T>) -> Option<&T>
+    where T: PartialOrd {
+    let mut largest_num = Option::<&T>::None;
     v.iter().for_each(|n| {
         if let Some(largest_n) = largest_num {
-            if largest_n < *n {
-                largest_num = Some(*n);
+            if largest_n < n {
+                largest_num = Some(n);
             }
         } else {
-            largest_num = Some(*n);
+            largest_num = Some(n);
         }
     });
     largest_num
@@ -33,9 +35,9 @@ pub fn find_largest_num2(v: &Vec<i32>) -> Option<i32> {
 
 #[cfg(test)]
 pub mod test {
-    use rand::RngExt;
     use crate::find_largest_num1;
     use crate::find_largest_num2;
+    use rand::RngExt;
 
     #[test]
     pub fn test_find_largest_compat() {
