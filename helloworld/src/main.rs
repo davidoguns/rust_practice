@@ -38,10 +38,6 @@ fn get_string() -> &'static str {
 }
 
 fn main() {
-    for _ in 0..15usize { 
-        println!("yo");
-    }
-    
     //named parameters are not a first-class feature of the language
     //this is possible because println!() is a macro
     println!("Named {x}, {x}, {z}, {y}", z = 3, y = 4, x = 5);

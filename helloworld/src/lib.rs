@@ -1,6 +1,7 @@
-pub mod foo; //-- this exposes child module foo to the same exposure as this "helloworld" module
-             // everywhere
-             // pub(crate) mod foo; // -- this only exposes the child module foo inside the current crate
+#[warn(clippy::pedantic)]
+
+pub mod foo;
+pub mod point;
 
 use foo::do_foo_sep;
 
@@ -11,19 +12,23 @@ pub fn do_bar() {
 }
 
 pub fn find_largest_num1<T>(v: &Vec<T>) -> Option<&T>
-    where T: PartialOrd {
+where
+    T: PartialOrd,
+{
     let mut largest_num = Option::<&T>::None;
     v.iter()
-        .for_each(|n| largest_num = Some(largest_num.map_or(n, |v| if v > n { v } else { n })));
+        .for_each(|n| largest_num = Some(largest_num.map_or(n, |m| if m > n { m } else { n })));
     largest_num
 }
 
 pub fn find_largest_num2<T>(v: &Vec<T>) -> Option<&T>
-    where T: PartialOrd {
+where
+    T: PartialOrd,
+{
     let mut largest_num = Option::<&T>::None;
     v.iter().for_each(|n| {
         if let Some(largest_n) = largest_num {
-            if largest_n < n {
+            if *largest_n < *n {
                 largest_num = Some(n);
             }
         } else {
@@ -33,33 +38,43 @@ pub fn find_largest_num2<T>(v: &Vec<T>) -> Option<&T>
     largest_num
 }
 
-pub fn find_largest_in_slice(v: &[i32]) -> &i32 {
+pub fn find_largest_in_slice<T: PartialOrd>(v: &[T]) -> Option<&T> {
     if v.len() == 0 {
-        return &0;
+        return None
     }
     let mut largest = &v[0];
-    
+
     for item in v {
         if item > largest {
             largest = item;
         }
     }
-    largest
+    Some(largest)
 }
 
 #[cfg(test)]
 pub mod test {
+    use crate::find_largest_in_slice;
     use crate::find_largest_num1;
     use crate::find_largest_num2;
-    use crate::find_largest_in_slice;
+    use crate::point::Point;
     use rand::RngExt;
+
+    #[test]
+    pub fn point_stuff() {
+        let p1 = Point::new(&1, &1);
+        assert!(p1.is_some(), "Point should be some!");
+        let p2 = Point::new(&i32::default(), &i32::default());
+        assert!(p2.is_none(), "Point should be none!");
+        println!("i32::default = {}", i32::default());
+    }
 
     #[test]
     pub fn test_find_largest_slice() {
         let arr = [23, 19, 0, 199, 15];
         let slice = &arr[..];
         let largest_in_empty = find_largest_in_slice(slice);
-        assert_eq!(largest_in_empty, &199);
+        assert_eq!(largest_in_empty, Some(&199));
     }
 
     #[test]
