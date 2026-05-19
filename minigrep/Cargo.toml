@@ -2,7 +2,7 @@
 name = "minigrep"
 version = "0.1.0"
 edition = "2024"
-author = "David Oguns <davidoguns@gmail.com"
+authors = ["David Oguns <davidoguns@gmail.com>"]
 description = "The Rust Book example project"
 
 [dependencies]

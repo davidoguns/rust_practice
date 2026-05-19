@@ -1,6 +1,7 @@
 pub struct SearchConfig {
     file_path: String,
     search_term: String,
+    ignore_case: bool,
 }
 
 impl SearchConfig {
@@ -8,6 +9,14 @@ impl SearchConfig {
         SearchConfig {
             file_path: String::from(file_path),
             search_term: String::from(search_term),
+            ignore_case: std::env::var("IGNORE_CASE").is_ok(),
+        }
+    }
+
+    pub fn build(args: &[String]) -> Result<SearchConfig, &'static str> {
+        match args.len() {
+            3 => Ok(SearchConfig::new(&args[2], &args[1])),
+            _ => Err("Must specify exactly 2 CLI arguments! minigrep <search> <file>"),
         }
     }
 
@@ -18,13 +27,74 @@ impl SearchConfig {
     pub fn search_term(&self) -> &String {
         &self.search_term
     }
+
+    pub fn ignore_case(&self) -> bool {
+        self.ignore_case
+    }
 }
 
-pub struct SearchLineResult {}
+pub fn search<'a>(query: &str, contents: &'a str) -> Vec<(usize, &'a str)> {
+    let mut matches = Vec::<(usize, &str)>::new();
+    for (line_no, line) in contents.lines().enumerate() {
+        if line.contains(query) {
+            matches.push((line_no, line));
+        }
+    }
+    matches
+}
+
+pub fn search_insensitive<'a>(query: &str, contents: &'a str) -> Vec<(usize, &'a str)> {
+    let query = query.to_lowercase();
+    let mut matches = Vec::<(usize, &str)>::new();
+    for (line_no, line) in contents.lines().enumerate() {
+        if line.to_lowercase().contains(query.as_str()) {
+            matches.push((line_no, line));
+        }
+    }
+    matches
+}
 
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    pub fn test_one_result() {
+        let query = String::from("duct");
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.";
+        assert_eq!(vec![(1, "safe, fast, productive.")],
+            search(query.as_str(), contents)
+        );
+    }
+
+    #[test]
+    pub fn test_case_sensitive() {
+        let query = String::from("duct");
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.
+Duct tape.";
+        assert_eq!(vec![(1, "safe, fast, productive.")],
+            search(query.as_str(), contents)
+        );
+    }
+
+    #[test]
+    pub fn test_case_insensitive() {
+        let query = String::from("rUsT");
+        let contents = "\
+Rust:
+safe, fast, productive.
+Pick three.
+Trust me.";
+        assert_eq!(vec![(0, "Rust:"), (3, "Trust me.")],
+            search_insensitive(query.as_str(), contents)
+        );
+    }
 
     #[test]
     pub fn test_search_config() {
