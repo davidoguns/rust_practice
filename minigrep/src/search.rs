@@ -5,18 +5,46 @@ pub struct SearchConfig {
 }
 
 impl SearchConfig {
-    pub fn new(file_path: &String, search_term: &String) -> SearchConfig {
+    pub fn new(file_path: &String, search_term: &String, ignore_case: bool) -> SearchConfig {
         SearchConfig {
             file_path: String::from(file_path),
             search_term: String::from(search_term),
-            ignore_case: std::env::var("IGNORE_CASE").is_ok(),
+            ignore_case,
         }
     }
 
     pub fn build(args: &[String]) -> Result<SearchConfig, &'static str> {
-        match args.len() {
-            3 => Ok(SearchConfig::new(&args[2], &args[1])),
-            _ => Err("Must specify exactly 2 CLI arguments! minigrep <search> <file>"),
+        let mut file_path = Option::<String>::None;
+        let mut search_term = Option::<String>::None;
+        let mut ignore_case = Option::<bool>::None;
+
+        if std::env::var("IGNORE_CASE").is_ok() {
+            ignore_case = Some(true)
+        }
+        
+        let mut args_itr = args.iter().skip(1); //skip one because the first is the program name
+        while let Some(arg) = args_itr.next() {
+           match arg.as_str() {
+               "-f" => {
+                   if let Some(value) = args_itr.next() {
+                       file_path = Some(value.clone())
+                   }
+               },
+               "-s" => {
+                   if let Some(value) = args_itr.next() {
+                       search_term = Some(value.clone())
+                   }
+               },
+               "-i" => { ignore_case = Some(true) },
+               a => {
+                   eprintln!("Unrecognized, and ignored CLI option found: {a}");
+               }
+           }
+        }
+        if file_path.is_some() &&  search_term.is_some() {
+            Ok(Self::new(&file_path.unwrap(), &search_term.unwrap(), ignore_case.unwrap_or(false)))
+        } else {
+            Err("Insufficient CLI arguments specified. Must at least specify -s <search_term> and -f <file_path>")
         }
     }
 
@@ -100,7 +128,7 @@ Trust me.";
     pub fn test_search_config() {
         let fp = String::from("foofile");
         let st = String::from("barterm");
-        let search_config = SearchConfig::new(&fp, &st);
+        let search_config = SearchConfig::new(&fp, &st, false);
         assert!(
             fp.cmp(search_config.file_path()) == std::cmp::Ordering::Equal,
             "Expected filepath to be [{}], found [{}]",
