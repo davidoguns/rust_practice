@@ -38,6 +38,15 @@ fn get_string() -> &'static str {
 }
 
 fn main() {
+    let mut list = vec![1 ,2, 3];
+    println!("Before defining closure: {list:?}");
+    std::thread::spawn(move || {
+        println!("From thread: {list:?}");
+        list.push(9);
+        println!("From thread: {list:?}");
+    }).join().unwrap();
+    return;
+
     //named parameters are not a first-class feature of the language
     //this is possible because println!() is a macro
     println!("Named {x}, {x}, {z}, {y}", z = 3, y = 4, x = 5);
