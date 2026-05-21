@@ -1,4 +1,5 @@
-use minigrep::search::{search, search_insensitive, SearchConfig};
+use minigrep::search::{search, search_insensitive};
+use minigrep::config::SearchConfig;
 use std::fs;
 use std::{env, error::Error};
 

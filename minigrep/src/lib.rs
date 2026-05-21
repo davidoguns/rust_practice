@@ -5,4 +5,4 @@
 //! it's not a pure copy-pasta job.
 
 pub mod search;
-
+pub mod config;
