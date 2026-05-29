@@ -1,0 +1,8 @@
+[package]
+name = "smartpointers"
+version = "0.1.0"
+edition = "2024"
+authors = ["David Oguns <davidoguns@gmail.com>"]
+description = "Sandbox for writing scratch code to test the raw behavior of Rust smart pointers"
+
+[dependencies]

@@ -38,6 +38,37 @@ fn get_string() -> &'static str {
 }
 
 fn main() {
+    let mut bstr1 = Box::new(String::from("hello"));
+    // since this is String::push_str(), the mutable borrow on self
+    // maintains bstr1. The Box<String> was not borrowed on self so
+    // it remains valid.
+    bstr1.push_str(" world");
+    // this looks like it should borrow out of Box string, but it's compiler
+    // checked so the mutable borrow is allowed, while bstr1 is valid
+    let unsure_str = bstr1.as_mut();
+    // this line borrows out of unsure_str who's type is &mut String.
+    // Because String::push_str() borrows mut from self, we cannot push_str
+    // immediately after. The reference is immediately consumed
+    unsure_str.push_str(" and again");
+    unsure_str.push_str(" and again");
+    // trouble resolving this line right here, why is 
+    // bstr1 not borrowed out of here from the bstr1.as_mut()?
+    // why do we still have a usable reference here?
+    // Rust somehow knows and enforces that the bstr1.as_mut() borrow
+    // must be completely finished, and then allows it to be used again
+    // knowing the borrow is over? Thus reference is still valid?
+    let unsure_strr2 = bstr1.as_mut();
+    unsure_strr2.push_str(" what");
+    bstr1.push_str(" forever");
+    let bstr2 = bstr1;
+    println!("Hello: {bstr2}");
+
+    // use std::rc::Rc;
+    // let rcstr1: Rc<String> = Rc::new(String::from("hello"));
+    // rcstr1.push_str(" world");
+    // let rcstr2 = &rcstr1;
+    // println!("Hello: {rcstr2}");
+
     let mut list = vec![1 ,2, 3];
     println!("Before defining closure: {list:?}");
     std::thread::spawn(move || {

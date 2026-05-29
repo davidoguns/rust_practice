@@ -6,3 +6,8 @@
 
 pub mod search;
 pub mod config;
+
+
+// re-exports directly to here: the crate's base module
+pub use self::search::{search, search_insensitive};
+pub use self::config::SearchConfig;
