@@ -1,11 +1,17 @@
+//! Basics of smart pointers used for basic LinkedList implementations. The
+//! goal here is to see how the various smart pointers affects ergonomics of
+//! various operations, especially in a mutability context from an interface
+//! perspective, but also implementation ease. Memory isn't a top concern.
+//! Performance could be and might add some benches (criterion) later after
+//! I feel closer to mastery.
+
 use std::fmt::Display ;
 
 pub trait List<T> {
     fn print_list(&self);
-
     fn value(&self) -> &T;
-
-    fn set_value(&mut self, value: &T) -> ();
+    fn set_value(&mut self, value: &T);
+    fn push_value(&mut self, value: &T);
 }
 
 /// LinkNode is a type that when handling the "list" should always be wrapped
@@ -45,6 +51,15 @@ impl<T: Copy + Display> List<T> for LinkNode<T> {
 
     fn set_value(&mut self, value: &T) -> () {
         self.value = *value;
+    }
+
+    fn push_value(&mut self, value: &T) {
+        match self.next {
+            None => { *self = LinkNode { value: *value, next: None }},
+            Some(ref mut next) => {
+                next.push_value(value);
+            }
+        }
     }
 }
 
@@ -86,47 +101,24 @@ impl<T: Copy + Display> List<T> for LinkList<T> {
         }
     }
 
-    fn set_value(&mut self, value: &T) -> () {
+    fn set_value(&mut self, val: &T) -> () {
         match self {
             Self::None => {}
-            Self::Node { value, next } => {
-                print!("(value={value})");
-                next.print_list();
+            Self::Node {value, .. } => {
+                *value = *val;
+            }
+        }
+    }
+
+    fn push_value(&mut self, value: &T) {
+        match self {
+            Self::None => { 
+                *self = LinkList::Node { value: *value, next: Box::new(LinkList::None) }
+            }
+            Self::Node { next, .. } => {
+                next.push_value(value)
             }
         }
     }
 }
 
-//
-//     pub fn build(values: &[T]) -> Rc<RefCell<Option<LinkNode<T>>>> {
-// impl<T: Copy + Display> LinkNode<T> {
-//         if values.is_empty() {
-//             Rc::new(RefCell::new(None))
-//         } else {
-//             let head = Rc::new(RefCell::new(Some(Self::new(
-//                 *values.get(0).unwrap(),
-//                 Self::build(&values[1..]),
-//             ))));
-//             head
-//         }
-//     }
-//
-//     pub fn new(value: T, next: Rc<RefCell<Option<LinkNode<T>>>>) -> LinkNode<T> {
-//         LinkNode { value, next }
-//     }
-//
-//     pub fn print_list(&self) {
-//         print!("{},", self.value);
-//         match self.next {
-//             Err(_) => { panic!("wut") }
-//             Ok(node) => {
-//                 let node = node.clone();
-//                 if let Some(node) = node {
-//                     node.print_list();
-//                 } else {
-//                     print!(";");
-//                 }
-//             }
-//         }
-//     }
-// }

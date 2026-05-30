@@ -21,6 +21,8 @@ fn print_list<T>(list: &impl List<T>) {
 }
 
 fn main() {
+    //Note: having a type based off of an Enum with it's own "None" value is
+    //way more ergonomic than a struct that is constantly wrapped in Option
     let mut list1 = linkedlist::LinkList::build(&[5, 4, 2, 1]);
     let mut list2 = linkedlist::LinkNode::build(&[5, 4, 2, 1]);
     print_lists(&list1, &list2);
@@ -35,5 +37,17 @@ fn main() {
     }
 
     print_list(&*list1);
-    print_list(&*list2.unwrap());
+    if let Some(ref list2_head) = list2 {
+        print_list(&**list2_head);
+    }
+
+    list1.push_value(&42);
+    if let Some(ref mut list2_head) = list2 {
+        list2_head.push_value(&22);
+    }
+
+    print_list(&*list1);
+    if let Some(ref list2_head) = list2 {
+        print_list(&**list2_head);
+    }
 }
