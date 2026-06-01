@@ -1,0 +1,12 @@
+[package]
+name = "concur_para_basics"
+version = "0.1.0"
+edition = "2024"
+authors = ["David Oguns <davidoguns@gmail.com>"]
+description = "Sandbox for testing concurrency, parallelism, and the building blocks around it."
+
+[dependencies]
+[dependencies.rand]
+version = "0.10"
+features = ["chacha"]
+
