@@ -5,7 +5,7 @@
 //! Performance could be and might add some benches (criterion) later after
 //! I feel closer to mastery.
 
-use std::fmt::Display ;
+use std::{fmt::Display} ;
 
 pub trait List<T> {
     fn print_list(&self);
@@ -14,9 +14,37 @@ pub trait List<T> {
     fn push_value(&mut self, value: &T);
 }
 
+pub struct LinkNodeList<T> {
+    head: Option<Box<LinkNode<T>>>,
+}
+
+impl<T: Copy + Display> LinkNodeList<T> {
+    pub fn build(values: &[T]) -> Self {
+        Self { head: LinkNode::build(&values) }
+    }
+}
+
+impl<T: Copy + Display> List<T> for LinkNodeList<T> {
+    fn print_list(&self) {
+        todo!()
+    }
+
+    fn value(&self) -> &T {
+        todo!()
+    }
+
+    fn set_value(&mut self, value: &T) {
+        todo!()
+    }
+
+    fn push_value(&mut self, value: &T) {
+        todo!()
+    }
+}
+
 /// LinkNode is a type that when handling the "list" should always be wrapped
 /// in an @Option<T> 
-pub struct LinkNode<T> {
+struct LinkNode<T> {
     value: T,
     next: Option<Box<LinkNode<T>>>
 }
