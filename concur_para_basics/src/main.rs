@@ -1,7 +1,7 @@
 use rand::distr::uniform::{UniformDuration, UniformSampler};
 use std::thread;
 use std::time::Duration;
-use std::sync::mpsc;
+use std::sync::{Arc, Mutex, mpsc};
 
 fn main() {
     let (tx_1, rx) = mpsc::channel();
@@ -67,5 +67,33 @@ fn main() {
     if let Err(e) = pure_producer_hndl.join() {
         eprintln!("Error waiting for producer handle: {e:?}");
     }
+
+    let atm_counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+    for thr_idx in 1..=50 {
+        let thrd_counter = Arc::clone(&atm_counter);
+        handles.push(std::thread::spawn(move || {
+            for try_idx in 1..=100 {
+                match thrd_counter.try_lock() {
+                    Ok(mut counter) => {
+                        *counter += 1;
+                        println!("Thread {thr_idx} succeeded after {try_idx} try_lock() attempts");
+                        return; //ends thread::spawn()
+                    },
+                    Err(_) => (),
+                }
+                thread::sleep(Duration::from_millis(10));
+            }
+            println!("Try locks failed...using blocking lock");
+            let mut counter = thrd_counter.lock().unwrap();
+            *counter += 1;
+        }));
+    }
+
+    for h in handles {
+        h.join().unwrap();
+    }
+
+    println!("Atomic counter final value {}", atm_counter.lock().unwrap());
 }
 
