@@ -1,4 +1,5 @@
 use rand::distr::uniform::{UniformDuration, UniformSampler};
+use std::sync::atomic::AtomicU32;
 use std::thread;
 use std::time::Duration;
 use std::sync::{Arc, Mutex, mpsc};
@@ -93,7 +94,32 @@ fn main() {
     for h in handles {
         h.join().unwrap();
     }
+    println!("Arc::Mutex counter final value {}", atm_counter.lock().unwrap());
 
-    println!("Atomic counter final value {}", atm_counter.lock().unwrap());
+    let atm_counter_2 = Arc::new(AtomicU32::new(0));
+    let atm_counter_1_ref = Arc::clone(&atm_counter_2);
+    let atm_counter_2_ref = Arc::clone(&atm_counter_2);
+    let atm_counter_3_ref = Arc::clone(&atm_counter_2);
+    let mut handles = vec![];
+    handles.push(std::thread::spawn(move || {
+        atm_counter_1_ref.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+    }));
+    handles.push(std::thread::spawn(move || {
+        atm_counter_2_ref.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+    }));
+    handles.push(std::thread::spawn(move || {
+        atm_counter_3_ref.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+    }));
+    for _ in 1..=20 {
+        let atm_counter_ref = Arc::clone(&atm_counter_2);
+        handles.push(std::thread::spawn(move || {
+            atm_counter_ref.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+        }));
+    }
+
+    for h in handles {
+        h.join().unwrap();
+    }
+    println!("Atomic counter final value {}", atm_counter_2.load(std::sync::atomic::Ordering::Acquire));
 }
 
